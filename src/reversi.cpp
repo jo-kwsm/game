@@ -41,15 +41,34 @@ public:
     wait();
   }
 
-  void display() {
-    cout << " |a|b|c|d|e|f|g|h|" << endl;
+  pair<int,int> count() {
+    pair<int,int> res={0,0};
     for(int i=0;i<8;i++) {
-      cout << i+1 << "|";
       for(int j=0;j<8;j++) {
-        cout << change[stage[i][j]] << "|";
+        if(stage[i][j]==1) {
+          res.first++;
+        }
+        else if(stage[i][j]==2) {
+          res.second++;
+        }
+      }
+    }
+    return res;
+  }
+
+  void display() {
+    pair<int,int> cnt=count();
+    cout << "you:" << cnt.first << ", com:" << cnt.second << endl;
+    cout << " | a | b | c | d | e | f | g | h |" << endl;
+    for(int i=0;i<8;i++) {
+      cout << "-+---+---+---+---+---+---+---+---+" << endl;
+      cout << i+1 << "| ";
+      for(int j=0;j<8;j++) {
+        cout << change[stage[i][j]] << " | ";
       }
       cout << endl;
     }
+    cout << "-+---+---+---+---+---+---+---+---+" << endl;
   }
 
   bool check() {
@@ -125,6 +144,11 @@ public:
         cout << "you should put two characters:";
         continue;
       }
+      if(hand[0]>hand[1]) {
+        int tmp=hand[0];
+        hand[0]=hand[1];
+        hand[1]=tmp;
+      }
       int y=hand[0]-'1';
       int x=hand[1]-'a';
       if(x<0||x>7||y<0||y>7) {
@@ -178,27 +202,12 @@ public:
     return true;
   }
 
-  int count() {
-    int res=0;
-    for(int i=0;i<8;i++) {
-      for(int j=0;j<8;j++) {
-        if(stage[i][j]==1) {
-          res++;
-        }
-        else if(stage[i][j]==2) {
-          res--;
-        }
-      }
-    }
-    return res;
-  }
-
   void endhing() {
-    int cnt=count();
-    if(cnt>0) {
+    pair<int,int> cnt=count();
+    if(cnt.first>cnt.second) {
       cout << "player win" << endl;
     }
-    else if(cnt<0) {
+    else if(cnt.first<cnt.second) {
       cout << "com win" << endl;
     }
     else {
