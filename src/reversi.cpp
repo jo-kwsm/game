@@ -59,16 +59,16 @@ public:
   void display() {
     pair<int,int> cnt=count();
     cout << "you:" << cnt.first << ", com:" << cnt.second << endl;
-    cout << " | a | b | c | d | e | f | g | h |" << endl;
+    cout << "  | a | b | c | d | e | f | g | h |" << endl;
     for(int i=0;i<8;i++) {
-      cout << "-+---+---+---+---+---+---+---+---+" << endl;
-      cout << i+1 << "| ";
+      cout << "--+---+---+---+---+---+---+---+---+" << endl;
+      cout << i+1 << " | ";
       for(int j=0;j<8;j++) {
         cout << change[stage[i][j]] << " | ";
       }
       cout << endl;
     }
-    cout << "-+---+---+---+---+---+---+---+---+" << endl;
+    cout << "--+---+---+---+---+---+---+---+---+" << endl;
   }
 
   bool check() {
@@ -101,12 +101,12 @@ public:
       if(stage[ny][nx]==v) continue;
       int f=0;
       while(ny<8&&nx<8&&nx>=0&&ny>=0&&stage[ny][nx]!=0) {
-        ny+=idy[i];
-        nx+=idx[i];
         if(stage[ny][nx]==v) {
           f=1;
           break;
         }
+        ny+=idy[i];
+        nx+=idx[i];
       }
       if(f) {
         while(ny!=y||nx!=x) {
@@ -221,6 +221,7 @@ public:
     while(check()) {
       if(!turn()) break;
     }
+    display();
     endhing();
   }
 };
