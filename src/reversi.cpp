@@ -10,6 +10,7 @@ private:
   int idy[8]={1,1,1,0,-1,-1,-1,0};
   int idx[8]={-1,0,1,1,1,0,-1,-1};
   int turn_player=1;
+  int cantPlay=0;
   vector<pair<int,int>> candidate;
 public:
   void init() {
@@ -101,16 +102,18 @@ public:
     return res;
   }
 
-  void com() {
+  bool com() {
     search(2);
     if(candidate.size()==0) {
       cout << "com can't play" << endl;
-      return;
+      cantPlay=1;
+      return false;
     }
     int idx=rand()%candidate.size();
     int y=candidate[idx].first;
     int x=candidate[idx].second;
     process(y,x,2,1);
+    return true;
   }
 
   pair<int,int> input() {
@@ -132,19 +135,47 @@ public:
     }
   }
 
-  void turn() {
+  bool turn() {
     display();
     if(turn_player==1) {
       search(1);
-      pair<int,int> hand=input();
-      process(hand.first,hand.second,1);
+      if(candidate.size()) {
+        pair<int,int> hand;
+        while(1) {
+          int f=0;
+          hand=input();
+          for(int i=0;i<candidate.size();i++) {
+            if(hand==candidate[i]) f=1; 
+          }
+          if(f) break;
+        }
+        process(hand.first,hand.second,1);
+        cantPlay=0;
+      }
+      else {
+        cout << "you can't play" << endl;
+        wait();
+        if(cantPlay) return false;
+        cantPlay=1;
+      }
     }
     else {
       cout << "com turn" << endl;
       wait();
-      com();
+      if(com()) {
+        cantPlay=0;
+      }
+      else {
+        if(cantPlay) {
+          return false;
+        }
+        else {
+          cantPlay=1;
+        }
+      }
     }
     turn_player=3-turn_player;
+    return true;
   }
 
   int count() {
@@ -179,7 +210,7 @@ public:
     init();
     opening();
     while(check()) {
-      turn();
+      if(!turn()) break;
     }
     endhing();
   }
