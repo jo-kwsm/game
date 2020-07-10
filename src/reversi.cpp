@@ -9,6 +9,7 @@ private:
   int idy[8]={1,1,1,0,-1,-1,-1,0};
   int idx[8]={-1,0,1,1,1,0,-1,-1};
   int turn_player=1;
+  pair<int,int> last={-1,-1};
   int cantPlay=0;
   string name;
   vector<pair<int,int>> candidate;
@@ -65,7 +66,11 @@ public:
       cout << "--+---+---+---+---+---+---+---+---+" << endl;
       cout << i+1 << " | ";
       for(int j=0;j<8;j++) {
-        cout << change[stage[i][j]] << " | ";
+        char res=change[stage[i][j]];
+        if(last.first==i&&last.second==j) {
+          res=res-'a'+'A';
+        }
+        cout << res << " | ";
       }
       cout << endl;
     }
@@ -97,6 +102,9 @@ public:
 
   bool process(int y, int x, int v, int reverse=1) {
     bool res=false;
+    if(reverse) {
+      last={y,x};
+    }
     for(int i=0;i<8;i++) {
       int ny=y+idy[i];
       int nx=x+idx[i];
@@ -198,10 +206,11 @@ public:
           }
         }
         if(f) {
-          (hand.first,hand.second,1);
+          process(hand.first,hand.second,1);
           cantPlay=0;
         }
         else {
+          last={-1,-1};
           int v=1;
           if(hand.second==-1) v=2;
           for(int i=0;i<8;i++) {
