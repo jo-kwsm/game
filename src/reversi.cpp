@@ -2,7 +2,6 @@
 using namespace std;
 
 
-
 class reversi {
 private:
   int stage[8][8];
@@ -11,6 +10,7 @@ private:
   int idx[8]={-1,0,1,1,1,0,-1,-1};
   int turn_player=1;
   int cantPlay=0;
+  string name;
   vector<pair<int,int>> candidate;
 public:
   void init() {
@@ -38,7 +38,8 @@ public:
     cout << "---------------" << endl;
     cout << "----reversi----" << endl;
     cout << "---------------" << endl;
-    wait();
+    cout << "put your name and enter:";
+    cin >> name;
   }
 
   pair<int,int> count() {
@@ -58,7 +59,7 @@ public:
 
   void display() {
     pair<int,int> cnt=count();
-    cout << "you:" << cnt.first << ", com:" << cnt.second << endl;
+    cout << name << ":" << cnt.first << ", com:" << cnt.second << endl;
     cout << "  | a | b | c | d | e | f | g | h |" << endl;
     for(int i=0;i<8;i++) {
       cout << "--+---+---+---+---+---+---+---+---+" << endl;
@@ -84,7 +85,9 @@ public:
     candidate.clear();
     for(int i=0;i<8;i++) {
       for(int j=0;j<8;j++) {
-        if(stage[i][j]) continue;
+        if(stage[i][j]) {
+          continue;
+        }
         if(process(i,j,v,0)) {
           candidate.push_back({i,j});
         }
@@ -97,8 +100,12 @@ public:
     for(int i=0;i<8;i++) {
       int ny=y+idy[i];
       int nx=x+idx[i];
-      if(ny>=8&&nx>=8&&nx<0&&ny<0) continue;
-      if(stage[ny][nx]==v) continue;
+      if(ny>=8&&nx>=8&&nx<0&&ny<0) {
+        continue;
+      }
+      if(stage[ny][nx]==v) {
+        continue;
+      }
       int f=0;
       while(ny<8&&nx<8&&nx>=0&&ny>=0&&stage[ny][nx]!=0) {
         if(stage[ny][nx]==v) {
@@ -110,11 +117,15 @@ public:
       }
       if(f) {
         while(ny!=y||nx!=x) {
-          if(reverse) stage[ny][nx]=v;
+          if(reverse) {
+            stage[ny][nx]=v;
+          }
           ny-=idy[i];
           nx-=idx[i];
         }
-        if(reverse) stage[ny][nx]=v;
+        if(reverse) {
+          stage[ny][nx]=v;
+        }
         res=true;
       }
     }
@@ -136,10 +147,16 @@ public:
   }
 
   pair<int,int> input() {
-    cout << "your turn:";
+    cout << name << "'s turn:";
     while(1) {
       string hand;
       cin >> hand;
+      if(hand=="win") {
+        return {-1,0};
+      }
+      if(hand=="lose") {
+        return {0,-1};
+      }
       if(hand.size()!=2) {
         cout << "you should put two characters:";
         continue;
@@ -163,23 +180,43 @@ public:
     display();
     if(turn_player==1) {
       search(1);
+      int f=0;
       if(candidate.size()) {
         pair<int,int> hand;
         while(1) {
-          int f=0;
           hand=input();
-          for(int i=0;i<candidate.size();i++) {
-            if(hand==candidate[i]) f=1; 
+          if(hand.first==-1||hand.second==-1) {
+            break;
           }
-          if(f) break;
+          for(int i=0;i<candidate.size();i++) {
+            if(hand==candidate[i]) {
+              f=1;
+            } 
+          }
+          if(f) {
+            break;
+          }
         }
-        process(hand.first,hand.second,1);
-        cantPlay=0;
+        if(f) {
+          (hand.first,hand.second,1);
+          cantPlay=0;
+        }
+        else {
+          int v=1;
+          if(hand.second==-1) v=2;
+          for(int i=0;i<8;i++) {
+            for(int j=0;j<8;j++) {
+              stage[i][j]=v;
+            }
+          }
+        }
       }
       else {
         cout << "you can't play" << endl;
         wait();
-        if(cantPlay) return false;
+        if(cantPlay) {
+          return false;
+        }
         cantPlay=1;
       }
     }
@@ -205,7 +242,7 @@ public:
   void endhing() {
     pair<int,int> cnt=count();
     if(cnt.first>cnt.second) {
-      cout << "player win" << endl;
+      cout << name << " win" << endl;
     }
     else if(cnt.first<cnt.second) {
       cout << "com win" << endl;
@@ -219,7 +256,9 @@ public:
     init();
     opening();
     while(check()) {
-      if(!turn()) break;
+      if(!turn()) {
+        break;
+      }
     }
     display();
     endhing();
